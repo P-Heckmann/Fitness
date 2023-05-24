@@ -14,7 +14,7 @@ st.markdown(
     ---
     ### Info
     - This is an example for a fitness tracker app made with [streamlit](https://streamlit.io)
-    - The app is inspired of the [garmin connect fitness app](https://connect.garmin.com/)
+    - The app is inspired by the [garmin connect fitness app](https://connect.garmin.com/)
     ---
     By [Paul Heckmann](https://www.paulheckmann.de/)
 """
