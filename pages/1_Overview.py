@@ -1,9 +1,6 @@
 import streamlit as st
-import gpxpy
 import pandas as pd
-from geopandas import GeoDataFrame as gdf
-from shapely.geometry import Point
-from datetime import datetime
+
 
 st.write("# Welcome to Fitness-tracker")
 
