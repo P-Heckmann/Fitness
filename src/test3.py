@@ -5,20 +5,26 @@ from matplotlib import pyplot as plt
 from matplotlib import dates as da
 
 
-file = r"C:\Users\paulh\Desktop\Fitness\data\Single_runs\activity_10981175453.tcx"
+# file = r"C:\Users\paulh\Desktop\Fitness\data\Single_runs\activity_10981175453.tcx"
+
+path = r"./data/Single_runs/activity_10981175453.tcx"
 
 # Load the TCX file into a Python dictionary
-with open(file, "r") as f:
+with open(path, "r") as f:
     data = xmltodict.parse(f.read())
 
-# Extract the activity data from the dictionary and convert it to a DataFrame
+# Extract the activity data from the dictionary
 activity = data["TrainingCenterDatabase"]["Activities"]["Activity"]
 
+# Conversion to DataFrame
 df = pd.json_normalize(activity, record_path=["Lap", "Track", "Trackpoint"])
 
+# why did I do this?
 df["Time"] = pd.to_datetime(df["Time"])
 
 df.columns.unique()
+
+df.columns.dtype()
 
 cols_to_convert = [
     "DistanceMeters",
@@ -30,7 +36,7 @@ cols_to_convert = [
     "Position.LongitudeDegrees",
 ]
 
-
+# Convert to float
 df[cols_to_convert] = df[cols_to_convert].astype(float)
 
 df = df.dropna()

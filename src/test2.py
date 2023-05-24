@@ -5,20 +5,23 @@ from shapely.geometry import Point
 from datetime import datetime
 
 # Load activity
-act_path = r"C:\Users\paulh\Desktop\Fitness\data\Single_runs\activity_10981175453.csv"
+
+act_path = r"./data/Single_runs/activity_10981175453.csv"
 
 act_df = pd.read_csv(act_path)
 
 
-# Load gpx.
-gpx_path = r"C:\Users\paulh\Desktop\Fitness\data\Geo\activity_10981175453.gpx"
+# Load GPX.
+# gpx_path = r"C:\Users\paulh\Desktop\Fitness\data\Geo\activity_10981175453.gpx"
 
-with open(gpx_path) as f:
-    gpx = gpxpy.parse(f)
+GPX_path = r"./data/Geo/activity_10981175453.gpx"
+
+with open(GPX_path) as f:
+    GPX = gpxpy.parse(f)
 
 # Convert to a dataframe one point at a time.
 points = []
-for segment in gpx.tracks[0].segments:
+for segment in GPX.tracks[0].segments:
     for p in segment.points:
         points.append(
             {
@@ -42,7 +45,7 @@ df["geometry"] = geometry
 
 # f["time"] = pd.to_datetime(df["time"])
 
-
+# transform to geopandas dataframe
 df_geo = gdf(df, crs="EPSG:4326", geometry=geometry)
 
 
