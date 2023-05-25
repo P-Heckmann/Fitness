@@ -1,0 +1,32 @@
+# Create a new figure
+fig, ax = plt.subplots()
+
+
+# Plot the data with timestamps on the x-axis
+plt.scatter(df_tcx["Time"], df_tcx["HeartRateBpm.Value"])
+
+formatter = da.dates.DateFormatter("%H:%M:%S")
+ax.xaxis.set_major_formatter(formatter)
+
+# Show the plot
+plt.show()
+
+# Elevation
+# Pace ?
+# Lap average pace
+# Heart rate bpm
+# Cadence - steps per minute (spm).
+# Run/Walk
+
+## stats
+
+## Laps - shown as table
+
+
+## Time in Zones - time and percentage shown
+
+# Zone 5   > 169 bpm • Maximum
+# Zone 4   150 - 168 bpm • Threshold
+# Zone 3   132 - 149 bpm • Aerobic
+# Zone 2   113 - 131 bpm • Easy
+# Zone 1   94 - 112 bpm • Warm Up
