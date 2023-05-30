@@ -259,3 +259,11 @@ st.markdown("""---""")
 st.write(f"#### Heart Rate Zones")
 
 # Create the Altair histogram
+chart = (
+    alt.Chart(df_tcx)
+    .mark_bar()
+    .encode(alt.X("Heart rate:Q"), alt.Y("count()"))
+    .properties(width=700, height=200)
+    .interactive()
+)
+chart
