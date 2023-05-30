@@ -9,14 +9,14 @@ import datetime
 
 
 # df_gpx = pd.read_pickle(r"./data/gpx-data.pkl")
-df_tcx = pd.read_pickle(r"./data/tcx-data.pkl")
-df_general_tcx = pd.read_pickle(r"./data/general-tcx-data.pkl")
+# df_tcx = pd.read_pickle(r"./data/tcx-data.pkl")
+# df_general_tcx = pd.read_pickle(r"./data/general-tcx-data.pkl")
 
 # df_gpx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\gpx-data.pkl")
-# df_tcx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\tcx-data.pkl")
-# df_general_tcx = pd.read_pickle(
-#    r"C:\Users\paulh\Desktop\Fitness\data\general-tcx-data.pkl"
-# )
+df_tcx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\tcx-data.pkl")
+df_general_tcx = pd.read_pickle(
+    r"C:\Users\paulh\Desktop\Fitness\data\general-tcx-data.pkl"
+)
 
 TOTAL_DISTANCE = round(df_general_tcx["DistanceMeters"].sum())
 TOTAL_TIME_SECONDS = round(df_general_tcx["TotalTimeSeconds"].sum())
@@ -114,7 +114,7 @@ chart = (
     .mark_area()
     .encode(
         x=alt.X(selected_variable),
-        y=alt.Y("AltitudeMeters:Q", scale=alt.Scale(domain=[0, 300]), title="meters"),
+        y=alt.Y("Altitude", scale=alt.Scale(domain=[0, 300]), title="meters"),
     )
     .properties(width=700, height=200)
     .interactive()
