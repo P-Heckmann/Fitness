@@ -114,7 +114,7 @@ chart = (
     .mark_area()
     .encode(
         x=alt.X(selected_variable),
-        y=alt.Y("AltitudeMeters", scale=alt.Scale(domain=[0, 300]), title="meters"),
+        y=alt.Y("AltitudeMeters:Q", scale=alt.Scale(domain=[0, 300]), title="meters"),
     )
     .properties(width=700, height=200)
     # .interactive()
