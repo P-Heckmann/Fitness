@@ -43,8 +43,8 @@ column_mapping2 = {
 # Rename the columns using the mapping
 df_general_tcx = df_general_tcx.rename(columns=column_mapping2)
 
-TOTAL_DISTANCE = round(df_general_tcx["DistanceMeters"].sum())
-TOTAL_TIME_SECONDS = round(df_general_tcx["TotalTimeSeconds"].sum())
+TOTAL_DISTANCE = round(df_general_tcx["Distance"].sum())
+TOTAL_TIME_SECONDS = round(df_general_tcx["Time"].sum())
 
 TOTAL_TIME = str(datetime.timedelta(seconds=TOTAL_TIME_SECONDS))
 
