@@ -33,14 +33,6 @@ for range_name, percentage in percentages.items():
 # Create a new DataFrame with percentages
 percentages_df = pd.DataFrame(percentages, index=["Percentage"])
 
-chart = (
-    alt.Chart(df_tcx)
-    .mark_bar()
-    .encode(alt.X("Heart rate:Q"), alt.Y("count()"))
-    .properties(width=700, height=200)
-    .interactive()
-)
-chart
 
 
 
