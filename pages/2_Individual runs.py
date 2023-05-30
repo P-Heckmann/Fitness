@@ -5,30 +5,40 @@ from matplotlib import dates as da
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
+import datetime
+
 
 # df_gpx = pd.read_pickle(r"./data/gpx-data.pkl")
-# df_tcx = pd.read_pickle(r"./data/tcx-data.pkl")
-# df_general_tcx = pd.read_pickle(r"./data/general-tcx-data.pkl")
+df_tcx = pd.read_pickle(r"./data/tcx-data.pkl")
+df_general_tcx = pd.read_pickle(r"./data/general-tcx-data.pkl")
 
-df_gpx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\gpx-data.pkl")
-df_tcx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\tcx-data.pkl")
-df_general_tcx = pd.read_pickle(
-    r"C:\Users\paulh\Desktop\Fitness\data\general-tcx-data.pkl"
-)
+# df_gpx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\gpx-data.pkl")
+# df_tcx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\tcx-data.pkl")
+# df_general_tcx = pd.read_pickle(
+#    r"C:\Users\paulh\Desktop\Fitness\data\general-tcx-data.pkl"
+# )
 
-TOTAL_DISTANCE = df_general_tcx["DistanceMeters"].sum()
-TOTAL_TIME = df_general_tcx["TotalTimeSeconds"].sum()
+TOTAL_DISTANCE = round(df_general_tcx["DistanceMeters"].sum())
+TOTAL_TIME_SECONDS = round(df_general_tcx["TotalTimeSeconds"].sum())
+
+TOTAL_TIME = str(datetime.timedelta(seconds=TOTAL_TIME_SECONDS))
+
+AVG_PACE_SECONDS = TOTAL_TIME_SECONDS / (TOTAL_DISTANCE / 1000)
+AVG_PACE = str(datetime.timedelta(seconds=round(AVG_PACE_SECONDS)))
+
+# TOTAL_ASCENT = df_general_tcx["TotalTimeSeconds"].sum
+
 TOTAL_CALORIES = df_general_tcx["Calories"].sum()
 
-st.write("### Name of Run")
+st.write("### Name and date of Run")
 st.markdown("""---""")
-st.write(f"#### Distance: {TOTAL_DISTANCE}")
-st.write(f"#### Time: {TOTAL_TIME}s")
+st.write(f"#### Distance: {TOTAL_DISTANCE} m")
+st.write(f"#### Time: {TOTAL_TIME}")
+st.write(f"#### Avg Pace: {AVG_PACE} /km")
+# st.write(f"#### Total Ascent: {TOTAL_ASCENT}")
 st.write(f"#### Calories: {TOTAL_CALORIES}")
 st.markdown("""---""")
 
-# AVG_PACE = 0
-# TOTAL_ASCENT = df_general_tcx["TotalTimeSeconds"].sum
 
 # first_coordinates = data["features"][0]["geometry"]["coordinates"]
 
@@ -44,26 +54,92 @@ m = folium.Map(
 )
 
 for index, row in df_tcx.iterrows():
-    folium.Marker(
-        [row["Position.LatitudeDegrees"], row["Position.LongitudeDegrees"]],
-        icon=folium.Icon(color="blue", icon="flag", prefix=""),
+    folium.CircleMarker(
+        [row["Position.LatitudeDegrees"], row["Position.LongitudeDegrees"]], radius=1
     ).add_to(m)
+
+folium.Marker(
+    location=(
+        df_tcx["Position.LatitudeDegrees"][0],
+        df_tcx["Position.LongitudeDegrees"][0],
+    ),
+    icon=folium.Icon(color="lightgray", icon="Flag", prefix=""),
+).add_to(m)
+
+folium.Marker(
+    location=(
+        df_tcx["Position.LatitudeDegrees"][20],
+        df_tcx["Position.LongitudeDegrees"][20],
+    ),
+    icon=folium.Icon(color="green", icon="Flag", prefix=""),
+).add_to(m)
 
 # call to render Folium map in Streamlit
 st_data = st_folium(m, width=700, height=400)
 
 st.markdown("""---""")
 
+
+# df_gpx["minutes"] = (df_gpx["time"] - df_gpx["time"].min()).dt.total_seconds() / 60
+df_tcx["Time"] = (df_tcx["Time"] - df_tcx["Time"].min()).dt.total_seconds() / 60
+# df_tcx["Distance in meters"] = df_tcx["DistanceMeters"]
+# df_tcx["speed"] = df_tcx["Extensions.ns3:TPX.ns3:Speed"]
+# df_tcx["Heart rate"] = df_tcx["HeartRateBpm.Value"]
+# df_tcx["Cadence"] = df_tcx["Extensions.ns3:TPX.ns3:RunCadence"]
+
+
+column_mapping1 = {
+    "DistanceMeters": "Distance",
+    "Extensions.ns3:TPX.ns3:Speed": "speed",
+    "HeartRateBpm.Value": "Heart rate",
+    "Extensions.ns3:TPX.ns3:RunCadence": "Cadence",
+    "Position.LatitudeDegrees": "Latitude",
+    "Position.LongitudeDegrees": "Longitude",
+    "AltitudeMeters": "Altitude",
+}
+# Rename the columns using the mapping
+df_tcx = df_tcx.rename(columns=column_mapping1)
+
+
+st.write(f"#### Elevation")
+
+variable_names = ["Time", "Distance"]
+
+selected_variable = st.selectbox(
+    "Select a variable to plot", variable_names, index=0, key="1"
+)
+
 chart = (
-    (
-        alt.Chart(df_tcx)
-        .mark_point()
-        .encode(
-            x=alt.X("DistanceMeters", scale=alt.Scale(zero=False)),
-            y=alt.Y("AltitudeMeters", scale=alt.Scale(zero=False)),
-        )
+    alt.Chart(df_tcx)
+    .mark_area()
+    .encode(
+        x=alt.X(selected_variable),
+        y=alt.Y("AltitudeMeters", scale=alt.Scale(domain=[0, 300]), title="meters"),
     )
-    .properties(width=700, height=400)
+    .properties(width=700, height=200)
+    .interactive()
+)
+
+chart
+
+
+st.markdown("""---""")
+
+st.write(f"#### Pace")
+
+
+selected_variable = st.selectbox(
+    "Select a variable to plot", variable_names, index=0, key="2"
+)
+
+chart = (
+    alt.Chart(df_tcx)
+    .mark_area()
+    .encode(
+        x=alt.X(selected_variable),
+        y=alt.Y("speed", scale=alt.Scale(domain=[0, 10]), title="minutes per km"),
+    )
+    .properties(width=700, height=200)
     .interactive()
 )
 
@@ -71,16 +147,162 @@ chart
 
 st.markdown("""---""")
 
-# Define the chart
+st.write(f"#### Heart rate")
+
+
+selected_variable = st.selectbox(
+    "Select a variable to plot", variable_names, index=0, key="3"
+)
+
 chart = (
     alt.Chart(df_tcx)
-    .mark_point()
+    .mark_area()
     .encode(
-        x=alt.X("Time:T", axis=alt.Axis(format="%H:%M")),
-        y=alt.Y("AltitudeMeters", scale=alt.Scale(zero=False)),
+        x=alt.X(selected_variable),
+        y=alt.Y("Heart rate", scale=alt.Scale(domain=[120, 180]), title="bpm"),
     )
-    .properties(width=700, height=400)
+    .properties(width=700, height=200)
     .interactive()
 )
 
 chart
+
+st.markdown("""---""")
+
+st.write(f"#### Cadence")
+
+
+selected_variable = st.selectbox(
+    "Select a variable to plot", variable_names, index=0, key="4"
+)
+
+chart = (
+    alt.Chart(df_tcx)
+    .mark_area()
+    .encode(
+        x=alt.X(selected_variable),
+        y=alt.Y("Cadence", scale=alt.Scale(domain=[50, 100]), title="spm"),
+    )
+    .properties(width=700, height=200)
+    .interactive()
+)
+
+chart
+
+
+st.markdown("""---""")
+
+st.write(f"#### Laps")
+
+
+df_general_tcx["Lap"] = list(range(1, len(df_general_tcx) + 1))
+
+column_mapping = {
+    "TotalTimeSeconds": "Time",
+    "DistanceMeters": "Distance",
+    "AverageHeartRateBpm.Value": "Avg HR",
+    "MaximumHeartRateBpm.Value": "Max HR",
+    "MaximumSpeed": "Max Pace",
+    "Extensions.ns3:LX.ns3:AvgSpeed": "Avg Pace",
+    "Extensions.ns3:LX.ns3:AvgRunCadence": "Avg Cadence",
+    "Extensions.ns3:LX.ns3:MaxRunCadence": "Max Cadence",
+}
+# Rename the columns using the mapping
+df_general_tcx = df_general_tcx.rename(columns=column_mapping)
+
+
+df_general_tcx["Time"] = df_general_tcx["Time"].astype(int)
+
+df_general_tcx["Distance"] = df_general_tcx["Distance"].astype(int)
+
+# df_general_tcx["Time"] = str(datetime.timedelta(seconds=df_general_tcx["Time"]))
+
+df_general_tcx["Cumulative time"] = df_general_tcx["Time"]
+
+# total ascent
+# total descent
+
+# summary
+
+df_laps = df_general_tcx[
+    [
+        "Lap",
+        "Time",
+        "Cumulative time",
+        "Distance",
+        "Avg Pace",
+        #        "Max Pace",
+        "Avg HR",
+        #        "Max HR",
+        "Avg Cadence",
+        #        "Max Cadence",
+        "Calories",
+    ]
+]
+
+df_laps.loc["Summary"] = df_laps.agg(
+    {
+        "Time": "sum",
+        "Cumulative time": "sum",
+        "Distance": "sum",
+        "Avg Pace": "mean",
+        #        "Max Pace": "mean",
+        "Avg HR": "mean",
+        #        "Max HR": "mean",
+        "Avg Cadence": "mean",
+        #        "Max Cadence": "mean",
+        "Calories": "mean",
+    }
+)
+
+st.dataframe(df_laps)
+
+
+st.markdown("""---""")
+
+st.write(f"#### Heart Rate Zones")
+
+
+# Create the Altair histogram
+chart = (
+    alt.Chart(df_tcx)
+    .mark_bar()
+    .encode(alt.X("Heart rate:Q"), alt.Y("count()"))
+    .properties(width=700, height=200)
+    .interactive()
+)
+chart
+
+df_tcx["Heart rate"]
+
+ranges = {
+    "Range 1": (0, 112),
+    "Range 2": (113, 131),
+    "Range 3": (132, 149),
+    "Range 4": (150, 168),
+    "Range 5": (169, 300),
+}
+
+total_values = len(df_tcx)
+percentages = {}
+
+for range_name, (start, end) in ranges.items():
+    count = ((df_tcx["Heart rate"] >= start) & (df_tcx["Heart rate"] <= end)).sum()
+    percentage = (count / total_values) * 100
+    percentages[range_name] = percentage
+
+# Print the percentages
+for range_name, percentage in percentages.items():
+    print(f"{range_name}: {percentage}%")
+
+
+# Create a new DataFrame with percentages
+percentages_df = pd.DataFrame(percentages, index=["Percentage"])
+
+""" Zone 5   > 169 bpm • Maximum
+Zone 4   150 - 168 bpm • Threshold 42:47 82%
+Zone 3   132 - 149 bpm • Aerobic 
+Zone 2   113 - 131 bpm • Easy
+Zone 1   94 - 112 bpm • Warm Up 
+
+ """
