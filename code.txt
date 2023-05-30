@@ -46,3 +46,45 @@ percentages_df = pd.DataFrame(percentages, index=["Percentage"])
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+def extract_tcx_data(file_path):
+    # Load the TCX file into a Python dictionary
+    with open(file_path, "r") as f:
+        data = xmltodict.parse(f.read())
+
+    # Extract the activity data from the dictionary
+    activity = data["TrainingCenterDatabase"]["Activities"]["Activity"]
+
+    # Conversion to DataFrame
+    df = pd.json_normalize(activity, record_path=["Lap", "Track", "Trackpoint"])
+
+    cols_to_convert = [
+        "AltitudeMeters",
+        "DistanceMeters",
+        "Position.LatitudeDegrees",
+        "Position.LongitudeDegrees",
+        "HeartRateBpm.Value",
+        "Extensions.ns3:TPX.ns3:Speed",
+        "Extensions.ns3:TPX.ns3:RunCadence",
+    ]
+
+    # Convert to float
+    df[cols_to_convert] = df[cols_to_convert].astype(float)
+
+    # Convert to datetime
+    df["Time"] = pd.to_datetime(df["Time"])
+
+    # df = df.dropna()
+
+    return df

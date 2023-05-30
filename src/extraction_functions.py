@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 import xmltodict
 import pandas as pd
+import os
+import glob
 
 
 def extract_gpx_data(file_path):
@@ -48,72 +50,95 @@ def extract_gpx_data(file_path):
     return df
 
 
-def extract_tcx_data(file_path):
-    # Load the TCX file into a Python dictionary
-    with open(file_path, "r") as f:
-        data = xmltodict.parse(f.read())
+def extract_tcx_data(directory):
+    # Get a list of all TCX files in the directory
+    tcx_files = glob.glob(os.path.join(directory, "*.tcx"))
 
-    # Extract the activity data from the dictionary
-    activity = data["TrainingCenterDatabase"]["Activities"]["Activity"]
+    # List to store individual DataFrames
+    dfs = []
 
-    # Conversion to DataFrame
-    df = pd.json_normalize(activity, record_path=["Lap", "Track", "Trackpoint"])
+    for file_path in tcx_files:
+        # Load the TCX file into a Python dictionary
+        with open(file_path, "r") as f:
+            data = xmltodict.parse(f.read())
 
-    cols_to_convert = [
-        "AltitudeMeters",
-        "DistanceMeters",
-        "Position.LatitudeDegrees",
-        "Position.LongitudeDegrees",
-        "HeartRateBpm.Value",
-        "Extensions.ns3:TPX.ns3:Speed",
-        "Extensions.ns3:TPX.ns3:RunCadence",
-    ]
+        # Extract the activity data from the dictionary
+        activity = data["TrainingCenterDatabase"]["Activities"]["Activity"]
 
-    # Convert to float
-    df[cols_to_convert] = df[cols_to_convert].astype(float)
+        # Conversion to DataFrame
+        df = pd.json_normalize(activity, record_path=["Lap", "Track", "Trackpoint"])
 
-    # Convert to datetime
-    df["Time"] = pd.to_datetime(df["Time"])
+        cols_to_convert = [
+            "AltitudeMeters",
+            "DistanceMeters",
+            "Position.LatitudeDegrees",
+            "Position.LongitudeDegrees",
+            "HeartRateBpm.Value",
+            "Extensions.ns3:TPX.ns3:Speed",
+            "Extensions.ns3:TPX.ns3:RunCadence",
+        ]
 
-    # df = df.dropna()
+        # Convert to float
+        df[cols_to_convert] = df[cols_to_convert].astype(float)
 
-    return df
+        # Convert to datetime
+        df["Time"] = pd.to_datetime(df["Time"])
+
+        dfs.append(df)
+
+    # Merge all DataFrames into a single DataFrame
+    merged_df = pd.concat(dfs, ignore_index=True)
+
+    return merged_df
 
 
-def extract_general_tcx_data(file_path):
-    with open(file_path, "r") as f:
-        data = xmltodict.parse(f.read())
+def extract_general_tcx_data(directory):
+    # Get a list of all TCX files in the directory
+    tcx_files = glob.glob(os.path.join(directory, "*.tcx"))
 
-    # Extract the activity data from the dictionary
-    activity = data["TrainingCenterDatabase"]["Activities"]["Activity"]
+    # List to store individual DataFrames
+    dfs = []
 
-    # Conversion to DataFrame
-    df = pd.json_normalize(activity, record_path=["Lap"])
+    for file_path in tcx_files:
+        # Load the TCX file into a Python dictionary
+        with open(file_path, "r") as f:
+            data = xmltodict.parse(f.read())
 
-    df = df.drop(["Intensity", "TriggerMethod", "Track.Trackpoint"], axis=1)
+        # Extract the activity data from the dictionary
+        activity = data["TrainingCenterDatabase"]["Activities"]["Activity"]
 
-    cols_to_float = [
-        "TotalTimeSeconds",
-        "DistanceMeters",
-        "MaximumSpeed",
-        "Extensions.ns3:LX.ns3:AvgSpeed",
-    ]
+        # Conversion to DataFrame
+        df = pd.json_normalize(activity, record_path=["Lap"])
 
-    cols_to_int = [
-        "Calories",
-        "AverageHeartRateBpm.Value",
-        "MaximumHeartRateBpm.Value",
-        "Extensions.ns3:LX.ns3:AvgRunCadence",
-        "Extensions.ns3:LX.ns3:MaxRunCadence",
-    ]
+        df = df.drop(["Intensity", "TriggerMethod", "Track.Trackpoint"], axis=1)
 
-    # Convert to float
-    df[cols_to_float] = df[cols_to_float].astype(float)
+        cols_to_float = [
+            "TotalTimeSeconds",
+            "DistanceMeters",
+            "MaximumSpeed",
+            "Extensions.ns3:LX.ns3:AvgSpeed",
+        ]
 
-    # Convert to int
-    df[cols_to_int] = df[cols_to_int].astype(int)
+        cols_to_int = [
+            "Calories",
+            "AverageHeartRateBpm.Value",
+            "MaximumHeartRateBpm.Value",
+            "Extensions.ns3:LX.ns3:AvgRunCadence",
+            "Extensions.ns3:LX.ns3:MaxRunCadence",
+        ]
 
-    # Convert to datetime
-    df["@StartTime"] = pd.to_datetime(df["@StartTime"])
+        # Convert to float
+        df[cols_to_float] = df[cols_to_float].astype(float)
 
-    return df
+        # Convert to int
+        df[cols_to_int] = df[cols_to_int].astype(int)
+
+        # Convert to datetime
+        df["@StartTime"] = pd.to_datetime(df["@StartTime"])
+
+        dfs.append(df)
+
+    # Merge all DataFrames into a single DataFrame
+    merged_df = pd.concat(dfs, ignore_index=True)
+
+    return merged_df
