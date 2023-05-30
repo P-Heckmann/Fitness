@@ -117,7 +117,7 @@ chart = (
         y=alt.Y("AltitudeMeters:Q", scale=alt.Scale(domain=[0, 300]), title="meters"),
     )
     .properties(width=700, height=200)
-    # .interactive()
+    .interactive()
 )
 
 chart
