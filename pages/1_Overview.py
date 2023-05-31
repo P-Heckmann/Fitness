@@ -12,8 +12,8 @@ import calendar
 st.write("# Overview")
 
 # df_gpx = pd.read_pickle(r"./data/gpx-data.pkl")
-df_tcx = pd.read_pickle(r"./data/tcx-data.pkl")
-df_general_tcx = pd.read_pickle(r"./data/general-tcx-data.pkl")
+df_tcx_overview = pd.read_pickle(r"./data/tcx-data.pkl")
+df_general_tcx_overview = pd.read_pickle(r"./data/general-tcx-data.pkl")
 
 
 # df_tcx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\merged-tcx-data.pkl")
@@ -21,19 +21,8 @@ df_general_tcx = pd.read_pickle(r"./data/general-tcx-data.pkl")
 #    r"C:\Users\paulh\Desktop\Fitness\data\merged-general-tcx-data.pkl"
 # )
 
-column_mapping1 = {
-    "DistanceMeters": "Distance in m",
-    "Extensions.ns3:TPX.ns3:Speed": "speed",
-    "HeartRateBpm.Value": "Heart rate",
-    "Extensions.ns3:TPX.ns3:RunCadence": "Cadence",
-    "Position.LatitudeDegrees": "Latitude",
-    "Position.LongitudeDegrees": "Longitude",
-    "AltitudeMeters": "Altitude",
-}
-# Rename the columns using the mapping
-df_tcx = df_tcx.rename(columns=column_mapping1)
 
-column_mapping2 = {
+column_mapping = {
     "TotalTimeSeconds": "Time",
     "DistanceMeters": "Distance",
     "AverageHeartRateBpm.Value": "Avg HR",
@@ -44,48 +33,46 @@ column_mapping2 = {
     "Extensions.ns3:LX.ns3:MaxRunCadence": "Max Cadence",
 }
 # Rename the columns using the mapping
-df_general_tcx = df_general_tcx.rename(columns=column_mapping2)
+df_general_tcx_overview = df_general_tcx_overview.rename(columns=column_mapping)
 
-TOTAL_DISTANCE = round(df_general_tcx["Distance"].sum())
+TOTAL_DISTANCE = round(df_general_tcx_overview["Distance"].sum())
 
-TOTAL_TIME_SECONDS = round(df_general_tcx["Time"].sum())
+TOTAL_TIME_SECONDS = round(df_general_tcx_overview["Time"].sum())
 TOTAL_TIME = str(datetime.timedelta(seconds=TOTAL_TIME_SECONDS))
 
 AVG_PACE_SECONDS = TOTAL_TIME_SECONDS / (TOTAL_DISTANCE / 1000)
 AVG_PACE = str(datetime.timedelta(seconds=round(AVG_PACE_SECONDS)))
 
-# TOTAL_ASCENT = df_general_tcx["TotalTimeSeconds"].sum
-# altitude is in tcx maybe difference betweeen min and max for each run
-# and then the sum
 
-TOTAL_CALORIES = df_general_tcx["Calories"].sum()
+TOTAL_CALORIES = df_general_tcx_overview["Calories"].sum()
 
 st.write(f"#### Distance: {TOTAL_DISTANCE} m")
 st.write(f"#### Time: {TOTAL_TIME}")
 st.write(f"#### Avg Pace: {AVG_PACE} /km")
-# st.write(f"#### Total Ascent: {TOTAL_ASCENT}")
 st.write(f"#### Calories: {TOTAL_CALORIES}")
 st.markdown("""---""")
 
 
-distance_by_day = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.date)[
-    "Distance"
-].sum()
+distance_by_day = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.date
+)["Distance"].sum()
 
-time_by_day = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.date)["Time"].sum()
+time_by_day = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.date
+)["Time"].sum()
 
 # time_by_day = round(time_by_day)
 
 
-max_pace_by_day = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.date)[
-    "Max Pace"
-].max()
-calories_by_day = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.date)[
-    "Calories"
-].sum()
-heart_rate_by_day = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.date)[
-    "Max HR"
-].max()
+max_pace_by_day = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.date
+)["Max Pace"].max()
+calories_by_day = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.date
+)["Calories"].sum()
+heart_rate_by_day = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.date
+)["Max HR"].max()
 
 
 # Create dictionary with series
@@ -128,23 +115,23 @@ histogram = (
 histogram
 st.markdown("""---""")
 
-distance_by_month = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.month)[
-    "Distance"
-].sum()
+distance_by_month = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.month
+)["Distance"].sum()
 
-time_by_month = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.month)[
-    "Time"
-].sum()
+time_by_month = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.month
+)["Time"].sum()
 
-max_pace_by_month = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.month)[
-    "Max Pace"
-].max()
-calories_by_month = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.month)[
-    "Calories"
-].sum()
-heart_rate_by_month = df_general_tcx.groupby(df_general_tcx["@StartTime"].dt.month)[
-    "Max HR"
-].max()
+max_pace_by_month = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.month
+)["Max Pace"].max()
+calories_by_month = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.month
+)["Calories"].sum()
+heart_rate_by_month = df_general_tcx_overview.groupby(
+    df_general_tcx_overview["@StartTime"].dt.month
+)["Max HR"].max()
 
 
 # Create dictionary with series
