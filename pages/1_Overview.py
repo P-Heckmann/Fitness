@@ -12,8 +12,8 @@ import calendar
 st.write("# Overview")
 
 # df_gpx = pd.read_pickle(r"./data/gpx-data.pkl")
-df_tcx_overview = pd.read_pickle(r"./data/tcx-data.pkl")
-df_general_tcx_overview = pd.read_pickle(r"./data/general-tcx-data.pkl")
+df_tcx_overview = pd.read_pickle(r"./data/merged-tcx-data.pkl")
+df_general_tcx_overview = pd.read_pickle(r"./data/merged-general-tcx-data.pkl")
 
 
 # df_tcx = pd.read_pickle(r"C:\Users\paulh\Desktop\Fitness\data\merged-tcx-data.pkl")
