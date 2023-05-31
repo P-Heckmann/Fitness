@@ -17,6 +17,7 @@ df_general_tcx = ef.extract_general_tcx_data(tcx_file)
 
 # df_general_tcx.columns.unique()
 df_tcx.dtypes
+df_general_tcx.dtypes
 
 # save dataframe
 # df_gpx.to_pickle(r"./data/gpx-data.pkl")

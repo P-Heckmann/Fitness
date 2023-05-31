@@ -127,6 +127,8 @@ def extract_general_tcx_data(directory):
             "Extensions.ns3:LX.ns3:MaxRunCadence",
         ]
 
+        df = df.dropna(axis=0)
+
         # Convert to float
         df[cols_to_float] = df[cols_to_float].astype(float)
 
