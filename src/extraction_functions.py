@@ -78,6 +78,8 @@ def extract_tcx_data(directory):
             "Extensions.ns3:TPX.ns3:RunCadence",
         ]
 
+        df = df.dropna(axis=0)
+
         # Convert to float
         df[cols_to_convert] = df[cols_to_convert].astype(float)
 
@@ -127,6 +129,9 @@ def extract_general_tcx_data(directory):
             "Extensions.ns3:LX.ns3:MaxRunCadence",
         ]
 
+        # Convert to datetime
+        df["@StartTime"] = pd.to_datetime(df["@StartTime"])
+
         df = df.dropna(axis=0)
 
         # Convert to float
@@ -134,9 +139,6 @@ def extract_general_tcx_data(directory):
 
         # Convert to int
         df[cols_to_int] = df[cols_to_int].astype(int)
-
-        # Convert to datetime
-        df["@StartTime"] = pd.to_datetime(df["@StartTime"])
 
         dfs.append(df)
 

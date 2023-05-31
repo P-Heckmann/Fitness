@@ -18,16 +18,16 @@ df_general_tcx = pd.read_pickle(
     r"C:\Users\paulh\Desktop\Fitness\data\merged-general-tcx-data.pkl"
 )
 
-
+st.write("# Individual runs")
 
 column_mapping1 = {
-    "DistanceMeters": "Distance",
+    "DistanceMeters": "Distance (m)",
     "Extensions.ns3:TPX.ns3:Speed": "speed",
-    "HeartRateBpm.Value": "Heart rate",
-    "Extensions.ns3:TPX.ns3:RunCadence": "Cadence",
+    "HeartRateBpm.Value": "Heart rate (bpm)",
+    "Extensions.ns3:TPX.ns3:RunCadence": "Cadence (spm)",
     "Position.LatitudeDegrees": "Latitude",
     "Position.LongitudeDegrees": "Longitude",
-    "AltitudeMeters": "Altitude",
+    "AltitudeMeters": "Altitude (m)",
 }
 # Rename the columns using the mapping
 df_tcx = df_tcx.rename(columns=column_mapping1)
@@ -45,37 +45,30 @@ column_mapping2 = {
 # Rename the columns using the mapping
 df_general_tcx = df_general_tcx.rename(columns=column_mapping2)
 
-TOTAL_DISTANCE = round(df_general_tcx["Distance"].sum())
-TOTAL_TIME_SECONDS = round(df_general_tcx["Time"].sum())
+df_tcx["Time (minutes)"] = (
+    df_tcx["Time"] - df_tcx["Time"].min()
+).dt.total_seconds() / 60
 
-TOTAL_TIME = str(datetime.timedelta(seconds=TOTAL_TIME_SECONDS))
+df_tcx["date"] = df_tcx["Time"].dt.date
 
-AVG_PACE_SECONDS = TOTAL_TIME_SECONDS / (TOTAL_DISTANCE / 1000)
-AVG_PACE = str(datetime.timedelta(seconds=round(AVG_PACE_SECONDS)))
-
-# TOTAL_ASCENT = df_general_tcx["TotalTimeSeconds"].sum
-
-TOTAL_CALORIES = df_general_tcx["Calories"].sum()
-
-st.write("### Name and date of Run")
-st.markdown("""---""")
-st.write(f"#### Distance: {TOTAL_DISTANCE} m")
-st.write(f"#### Time: {TOTAL_TIME}")
-st.write(f"#### Avg Pace: {AVG_PACE} /km")
-# st.write(f"#### Total Ascent: {TOTAL_ASCENT}")
-st.write(f"#### Calories: {TOTAL_CALORIES}")
-st.markdown("""---""")
+# Get unique dates
+unique_dates = df_tcx["date"].unique().tolist()
 
 
-# first_coordinates = data["features"][0]["geometry"]["coordinates"]
+selected_date = st.selectbox("Select a date", unique_dates, index=0, key="3")
 
-test = df_tcx["Latitude"][0]
+
+# df_tcx = df_tcx[df_tcx["date"] == datetime.date(2023, 2, 15)]
+df_tcx = df_tcx[df_tcx["date"] == selected_date]
+
+LOCATION = (
+    df_tcx["Latitude"][df_tcx.index[1]],
+    df_tcx["Longitude"][df_tcx.index[1]],
+)
+
 
 m = folium.Map(
-    location=(
-        df_tcx["Latitude"][0],
-        df_tcx["Longitude"][0],
-    ),
+    location=LOCATION,
     zoom_start=15,
     tiles="cartodb positron",
 )
@@ -84,20 +77,10 @@ for index, row in df_tcx.iterrows():
     folium.CircleMarker([row["Latitude"], row["Longitude"]], radius=1).add_to(m)
 
 folium.Marker(
-    location=(
-        df_tcx["Latitude"][0],
-        df_tcx["Longitude"][0],
-    ),
+    location=LOCATION,
     icon=folium.Icon(color="lightgray", icon="Flag", prefix=""),
 ).add_to(m)
 
-folium.Marker(
-    location=(
-        df_tcx["Latitude"][20],
-        df_tcx["Longitude"][20],
-    ),
-    icon=folium.Icon(color="green", icon="Flag", prefix=""),
-).add_to(m)
 
 # call to render Folium map in Streamlit
 st_data = st_folium(m, width=700, height=400)
@@ -105,20 +88,12 @@ st_data = st_folium(m, width=700, height=400)
 st.markdown("""---""")
 
 
-# df_gpx["minutes"] = (df_gpx["time"] - df_gpx["time"].min()).dt.total_seconds() / 60
-df_tcx["Time"] = (df_tcx["Time"] - df_tcx["Time"].min()).dt.total_seconds() / 60
-# df_tcx["Distance in meters"] = df_tcx["DistanceMeters"]
-# df_tcx["speed"] = df_tcx["Extensions.ns3:TPX.ns3:Speed"]
-# df_tcx["Heart rate"] = df_tcx["HeartRateBpm.Value"]
-# df_tcx["Cadence"] = df_tcx["Extensions.ns3:TPX.ns3:RunCadence"]
-
-
 st.write(f"#### Elevation")
 
-variable_names = ["Time", "Distance"]
+variable_names = ["Time (minutes)", "Distance (m)"]
 
 selected_variable = st.selectbox(
-    "Select a variable to plot", variable_names, index=0, key="1"
+    "Select a variable to plot", variable_names, index=0, key="4"
 )
 
 chart = (
@@ -126,7 +101,7 @@ chart = (
     .mark_area()
     .encode(
         x=alt.X(selected_variable),
-        y=alt.Y("Altitude", scale=alt.Scale(domain=[0, 300]), title="meters"),
+        y=alt.Y("Altitude (m)", scale=alt.Scale(domain=[0, 300]), title="meters"),
     )
     .properties(width=700, height=200)
     .interactive()
@@ -140,7 +115,7 @@ st.write(f"#### Pace")
 
 
 selected_variable = st.selectbox(
-    "Select a variable to plot", variable_names, index=0, key="2"
+    "Select a variable to plot", variable_names, index=0, key="5"
 )
 
 chart = (
@@ -156,13 +131,14 @@ chart = (
 
 chart
 
+
 st.markdown("""---""")
 
 st.write(f"#### Heart rate")
 
 
 selected_variable = st.selectbox(
-    "Select a variable to plot", variable_names, index=0, key="3"
+    "Select a variable to plot", variable_names, index=0, key="6"
 )
 
 chart = (
@@ -170,7 +146,7 @@ chart = (
     .mark_area()
     .encode(
         x=alt.X(selected_variable),
-        y=alt.Y("Heart rate", scale=alt.Scale(domain=[120, 180]), title="bpm"),
+        y=alt.Y("Heart rate (bpm)", scale=alt.Scale(domain=[120, 180]), title="bpm"),
     )
     .properties(width=700, height=200)
     .interactive()
@@ -184,7 +160,7 @@ st.write(f"#### Cadence")
 
 
 selected_variable = st.selectbox(
-    "Select a variable to plot", variable_names, index=0, key="4"
+    "Select a variable to plot", variable_names, index=0, key="7"
 )
 
 chart = (
@@ -192,7 +168,7 @@ chart = (
     .mark_area()
     .encode(
         x=alt.X(selected_variable),
-        y=alt.Y("Cadence", scale=alt.Scale(domain=[50, 100]), title="spm"),
+        y=alt.Y("Cadence (spm)", scale=alt.Scale(domain=[50, 100]), title="spm"),
     )
     .properties(width=700, height=200)
     .interactive()
@@ -202,70 +178,3 @@ chart
 
 
 st.markdown("""---""")
-
-st.write(f"#### Laps")
-
-
-df_general_tcx["Lap"] = list(range(1, len(df_general_tcx) + 1))
-
-
-df_general_tcx["Time"] = df_general_tcx["Time"].astype(int)
-
-df_general_tcx["Distance"] = df_general_tcx["Distance"].astype(int)
-
-# df_general_tcx["Time"] = str(datetime.timedelta(seconds=df_general_tcx["Time"]))
-
-df_general_tcx["Cumulative time"] = df_general_tcx["Time"]
-
-# total ascent
-# total descent
-
-# summary
-
-df_laps = df_general_tcx[
-    [
-        "Lap",
-        "Time",
-        "Cumulative time",
-        "Distance",
-        "Avg Pace",
-        #        "Max Pace",
-        "Avg HR",
-        #        "Max HR",
-        "Avg Cadence",
-        #        "Max Cadence",
-        "Calories",
-    ]
-]
-
-df_laps.loc["Summary"] = df_laps.agg(
-    {
-        "Time": "sum",
-        "Cumulative time": "sum",
-        "Distance": "sum",
-        "Avg Pace": "mean",
-        #        "Max Pace": "mean",
-        "Avg HR": "mean",
-        #        "Max HR": "mean",
-        "Avg Cadence": "mean",
-        #        "Max Cadence": "mean",
-        "Calories": "mean",
-    }
-)
-
-st.dataframe(df_laps)
-
-
-st.markdown("""---""")
-
-st.write(f"#### Heart Rate Zones")
-
-# Create the Altair histogram
-chart = (
-    alt.Chart(df_tcx)
-    .mark_bar()
-    .encode(alt.X("Heart rate:Q"), alt.Y("count()"))
-    .properties(width=700, height=200)
-    .interactive()
-)
-chart

@@ -1,0 +1,34 @@
+
+m = folium.Map(
+    location=(
+        df_tcx["Latitude"][0],
+        df_tcx["Longitude"][0],
+    ),
+    zoom_start=15,
+    tiles="cartodb positron",
+)
+
+for index, row in df_tcx.iterrows():
+    folium.CircleMarker([row["Latitude"], row["Longitude"]], radius=1).add_to(m)
+
+folium.Marker(
+    location=(
+        df_tcx["Latitude"][0],
+        df_tcx["Longitude"][0],
+    ),
+    icon=folium.Icon(color="lightgray", icon="Flag", prefix=""),
+).add_to(m)
+
+folium.Marker(
+    location=(
+        df_tcx["Latitude"][20],
+        df_tcx["Longitude"][20],
+    ),
+    icon=folium.Icon(color="green", icon="Flag", prefix=""),
+).add_to(m)
+
+# call to render Folium map in Streamlit
+st_data = st_folium(m, width=700, height=400)
+
+st.markdown("""---""")
+
