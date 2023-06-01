@@ -69,7 +69,7 @@ TOTAL_DISTANCE = round(df_tcx["Distance (m)"].max())
 TOTAL_TIME = round(df_tcx["Time (minutes)"].max())
 
 st.write(f"#### Distance: {TOTAL_DISTANCE} m")
-st.write(f"#### Time: {TOTAL_TIME}")
+st.write(f"#### Time: {TOTAL_TIME} minutes")
 
 
 LOCATION = (
