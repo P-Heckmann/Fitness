@@ -174,8 +174,7 @@ st.altair_chart(chart, use_container_width=True)
 
 st.markdown("""---""")
 
-
-df_tcx["Heart rate (bpm)"]
+st.write(f"#### Trainings zone")
 
 ranges = {
     "Zone 1": (0, 112),
