@@ -222,7 +222,7 @@ df_long = pd.melt(
 
 SUM_TIME = df_tcx["Time (minutes)"].max()
 
-df_long["Time"] = (df_long["Percentage"] / 100) * SUM_TIME
+df_long["Time (minutes)"] = (df_long["Percentage"] / 100) * SUM_TIME
 
 
 metric_name = ["Percentage", "Time (minutes)"]
