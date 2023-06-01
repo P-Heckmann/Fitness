@@ -8,7 +8,6 @@ from streamlit_folium import st_folium
 import datetime
 
 
-# df_gpx = pd.read_pickle(r"./data/gpx-data.pkl")
 df_tcx = pd.read_pickle(r"./data/merged-tcx-data.pkl")
 df_general_tcx = pd.read_pickle(r"./data/merged-general-tcx-data.pkl")
 
@@ -173,5 +172,52 @@ chart = (
 
 st.altair_chart(chart, use_container_width=True)
 
-
 st.markdown("""---""")
+
+
+df_tcx["Heart rate (bpm)"]
+
+ranges = {
+    "Zone 1": (0, 112),
+    "Zone 2": (113, 131),
+    "Zone 3": (132, 149),
+    "Zone 4": (150, 168),
+    "Zone 5": (169, 300),
+}
+
+total_values = len(df_tcx)
+percentages = {}
+
+for range_name, (start, end) in ranges.items():
+    count = (
+        (df_tcx["Heart rate (bpm)"] >= start) & (df_tcx["Heart rate (bpm)"] <= end)
+    ).sum()
+    percentage = (count / total_values) * 100
+    percentages[range_name] = percentage
+
+# Print the percentages
+for range_name, percentage in percentages.items():
+    print(f"{range_name}: {percentage}%")
+
+
+# Create a new DataFrame with percentages
+percentages_df = pd.DataFrame(percentages, index=["Percentage"])
+
+percentages_df = percentages_df.reset_index()
+
+df_long = pd.melt(
+    percentages_df, id_vars="index", var_name="Zone", value_name="Percentage"
+)
+
+
+histogram = (
+    alt.Chart(df_long)
+    .mark_bar()
+    .encode(
+        x=alt.X("Zone", axis=alt.Axis(title="")),
+        y=alt.Y("Percentage:Q"),
+    )
+    .interactive()
+)
+
+st.altair_chart(histogram, use_container_width=True)
