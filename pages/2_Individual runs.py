@@ -19,6 +19,7 @@ df_general_tcx = pd.read_pickle(r"./data/merged-general-tcx-data.pkl")
 
 st.write("# Individual runs")
 
+
 column_mapping1 = {
     "DistanceMeters": "Distance (m)",
     "Extensions.ns3:TPX.ns3:Speed": "speed",
@@ -44,9 +45,11 @@ column_mapping2 = {
 # Rename the columns using the mapping
 df_general_tcx = df_general_tcx.rename(columns=column_mapping2)
 
+
 df_tcx["Time (minutes)"] = (
     df_tcx["Time"] - df_tcx["Time"].min()
 ).dt.total_seconds() / 60
+
 
 df_tcx["date"] = df_tcx["Time"].dt.date
 
@@ -59,6 +62,15 @@ selected_date = st.selectbox("Select a date", unique_dates, index=0, key="3")
 
 # df_tcx = df_tcx[df_tcx["date"] == datetime.date(2023, 2, 15)]
 df_tcx = df_tcx[df_tcx["date"] == selected_date]
+
+
+TOTAL_DISTANCE = round(df_tcx["Distance (m)"].max())
+
+TOTAL_TIME = round(df_tcx["Time (minutes)"].max())
+
+st.write(f"#### Distance: {TOTAL_DISTANCE} m")
+st.write(f"#### Time: {TOTAL_TIME}")
+
 
 LOCATION = (
     df_tcx["Latitude"][df_tcx.index[1]],
@@ -208,12 +220,12 @@ df_long = pd.melt(
     percentages_df, id_vars="index", var_name="Zone", value_name="Percentage"
 )
 
-SUM_TIME = df_tcx["Time (minutes)"].sum()
+SUM_TIME = df_tcx["Time (minutes)"].max()
 
 df_long["Time"] = (df_long["Percentage"] / 100) * SUM_TIME
 
 
-metric_name = ["Percentage", "Time"]
+metric_name = ["Percentage", "Time (minutes)"]
 
 selected_variable = st.selectbox(
     "Select a variable to plot", metric_name, index=0, key="8"
