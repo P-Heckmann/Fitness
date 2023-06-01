@@ -206,10 +206,6 @@ for range_name, (start, end) in ranges.items():
     percentage = (count / total_values) * 100
     percentages[range_name] = percentage
 
-# Print the percentages
-for range_name, percentage in percentages.items():
-    print(f"{range_name}: {percentage}%")
-
 
 # Create a new DataFrame with percentages
 percentages_df = pd.DataFrame(percentages, index=["Percentage"])
