@@ -109,10 +109,9 @@ histogram = (
         x=alt.X("@StartTime:T", axis=alt.Axis(title="")),
         y=alt.Y(selected_variable),
     )
-    .properties(width="container", height="container")
     .interactive()
 )
-histogram
+st.altair_chart(histogram, use_container_width=True)
 st.markdown("""---""")
 
 distance_by_month = df_general_tcx_overview.groupby(
