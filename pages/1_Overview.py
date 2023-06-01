@@ -161,8 +161,8 @@ histogram = (
         x=alt.X("@StartTime:N", axis=alt.Axis(title="")),
         y=alt.Y(selected_variable),
     )
-    .properties(width="container", height="container")
     .interactive()
 )
-histogram
+
+st.altair_chart(histogram, use_container_width=True)
 st.markdown("""---""")
