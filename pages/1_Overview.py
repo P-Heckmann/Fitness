@@ -109,7 +109,7 @@ histogram = (
         x=alt.X("@StartTime:T", axis=alt.Axis(title="")),
         y=alt.Y(selected_variable),
     )
-    .properties(width=700, height=200)
+    .properties(width="container", height="container")
     .interactive()
 )
 histogram
