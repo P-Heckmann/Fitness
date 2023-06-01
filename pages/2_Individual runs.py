@@ -83,7 +83,7 @@ folium.Marker(
 
 
 # call to render Folium map in Streamlit
-st_data = st_folium(m, width=700, height=400)
+st_data = st_folium(m, use_container_width=True)
 
 st.markdown("""---""")
 
