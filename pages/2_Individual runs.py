@@ -208,13 +208,23 @@ df_long = pd.melt(
     percentages_df, id_vars="index", var_name="Zone", value_name="Percentage"
 )
 
+SUM_TIME = df_tcx["Time (minutes)"].sum()
+
+df_long["Time"] = (df_long["Percentage"] / 100) * SUM_TIME
+
+
+metric_name = ["Percentage", "Time"]
+
+selected_variable = st.selectbox(
+    "Select a variable to plot", metric_name, index=0, key="8"
+)
 
 histogram = (
     alt.Chart(df_long)
     .mark_bar()
     .encode(
         x=alt.X("Zone", axis=alt.Axis(title="")),
-        y=alt.Y("Percentage:Q"),
+        y=alt.Y(selected_variable),
     )
     .interactive()
 )
