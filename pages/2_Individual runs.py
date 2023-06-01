@@ -46,11 +46,6 @@ column_mapping2 = {
 df_general_tcx = df_general_tcx.rename(columns=column_mapping2)
 
 
-df_tcx["Time (minutes)"] = (
-    df_tcx["Time"] - df_tcx["Time"].min()
-).dt.total_seconds() / 60
-
-
 df_tcx["date"] = df_tcx["Time"].dt.date
 
 # Get unique dates
@@ -60,8 +55,13 @@ unique_dates = df_tcx["date"].unique().tolist()
 selected_date = st.selectbox("Select a date", unique_dates, index=0, key="3")
 
 
-# df_tcx = df_tcx[df_tcx["date"] == datetime.date(2023, 2, 15)]
+# df_tcx = df_tcx[df_tcx["date"] == datetime.date(2023, 2, 18)]
 df_tcx = df_tcx[df_tcx["date"] == selected_date]
+
+
+df_tcx["Time (minutes)"] = (
+    df_tcx["Time"] - df_tcx["Time"].min()
+).dt.total_seconds() / 60
 
 
 TOTAL_DISTANCE = round(df_tcx["Distance (m)"].max())
