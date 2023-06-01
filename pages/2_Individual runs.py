@@ -103,11 +103,11 @@ chart = (
         x=alt.X(selected_variable),
         y=alt.Y("Altitude (m)", scale=alt.Scale(domain=[0, 300]), title="meters"),
     )
-    .properties(width=700, height=200)
     .interactive()
 )
 
-chart
+st.altair_chart(chart, use_container_width=True)
+
 
 st.markdown("""---""")
 
@@ -125,11 +125,10 @@ chart = (
         x=alt.X(selected_variable),
         y=alt.Y("speed", scale=alt.Scale(domain=[0, 10]), title="minutes per km"),
     )
-    .properties(width=700, height=200)
     .interactive()
 )
 
-chart
+st.altair_chart(chart, use_container_width=True)
 
 
 st.markdown("""---""")
@@ -148,11 +147,10 @@ chart = (
         x=alt.X(selected_variable),
         y=alt.Y("Heart rate (bpm)", scale=alt.Scale(domain=[120, 180]), title="bpm"),
     )
-    .properties(width=700, height=200)
     .interactive()
 )
 
-chart
+st.altair_chart(chart, use_container_width=True)
 
 st.markdown("""---""")
 
@@ -170,11 +168,10 @@ chart = (
         x=alt.X(selected_variable),
         y=alt.Y("Cadence (spm)", scale=alt.Scale(domain=[50, 100]), title="spm"),
     )
-    .properties(width=700, height=200)
     .interactive()
 )
 
-chart
+st.altair_chart(chart, use_container_width=True)
 
 
 st.markdown("""---""")
