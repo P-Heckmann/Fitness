@@ -1,11 +1,10 @@
 import pandas as pd
 import altair as alt
-from matplotlib import pyplot as plt
-from matplotlib import dates as da
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
-import datetime
+
+# import datetime
 
 
 df_tcx = pd.read_pickle(r"./data/merged-tcx-data.pkl")
@@ -54,8 +53,6 @@ unique_dates = df_tcx["date"].unique().tolist()
 
 selected_date = st.selectbox("Select a date", unique_dates, index=0, key="3")
 
-
-# df_tcx = df_tcx[df_tcx["date"] == datetime.date(2023, 2, 18)]
 df_tcx = df_tcx[df_tcx["date"] == selected_date]
 
 
@@ -207,7 +204,6 @@ for range_name, (start, end) in ranges.items():
     percentages[range_name] = percentage
 
 
-# Create a new DataFrame with percentages
 percentages_df = pd.DataFrame(percentages, index=["Percentage"])
 
 percentages_df = percentages_df.reset_index()
