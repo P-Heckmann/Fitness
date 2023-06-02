@@ -1,9 +1,5 @@
 matplotlib==3.7.1
 pandas==1.5.3
-#numpy==1.24.2
-#scikit-learn==1.2.2
-#fiona==1.9.3
-#pydeck==0.8.0
 folium==0.14.0
 streamlit-folium== 0.11.1
 streamlit==1.21.0
