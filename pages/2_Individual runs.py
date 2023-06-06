@@ -4,9 +4,6 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-# import datetime
-
-
 df_tcx = pd.read_pickle(r"./data/merged-tcx-data.pkl")
 df_general_tcx = pd.read_pickle(r"./data/merged-general-tcx-data.pkl")
 
