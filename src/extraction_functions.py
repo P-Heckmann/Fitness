@@ -6,6 +6,15 @@ import glob
 
 
 def extract_gpx_data(file_path):
+    """
+    This function parses a GPX (GPS Exchange Format) file and extracts specific data, including latitude, longitude, elevation, time, heart rate, and cadence, from the trackpoints. The extracted data is returned as a pandas DataFrame.
+
+    Args:
+        file_path (string): The path to the GPX file to be parsed.
+
+    Returns:
+        df (pandas DataFrame): A DataFrame containing the extracted data from the GPX file.
+    """
     # Parse the GPX file
     tree = ET.parse(file_path)
     root = tree.getroot()
@@ -51,6 +60,15 @@ def extract_gpx_data(file_path):
 
 
 def extract_tcx_data(directory):
+    """
+    This function extracts data from TCX (Training Center XML) files located in a specified directory. It loads each TCX file into a Python dictionary, extracts the activity data, and converts it into a pandas DataFrame. The function returns a merged DataFrame containing data from all the TCX files.
+
+    Args:
+        directory (string): The directory path containing the TCX files.
+
+    Returns:
+        merged_df (pandas DataFrame): A DataFrame that combines the extracted data from all TCX files.
+    """
     # Get a list of all TCX files in the directory
     tcx_files = glob.glob(os.path.join(directory, "*.tcx"))
 
@@ -95,6 +113,15 @@ def extract_tcx_data(directory):
 
 
 def extract_general_tcx_data(directory):
+    """
+    This function extracts general data from TCX (Training Center XML) files located in a specified directory. It loads each TCX file into a Python dictionary, extracts the activity data, performs data conversions and transformations, and merges the extracted data into a single pandas DataFrame. The function returns the merged DataFrame containing the general TCX data.
+
+    Args:
+        directory (string): The directory path containing the TCX files.
+
+    Returns:
+        merged_df (pandas DataFrame): A DataFrame that combines the extracted general data from all TCX files.
+    """
     # Get a list of all TCX files in the directory
     tcx_files = glob.glob(os.path.join(directory, "*.tcx"))
 
