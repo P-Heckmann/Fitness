@@ -1,6 +1,5 @@
 import extraction_functions as ef
 
-
 # Specify the GPX file path
 tcx_file = r"./data/activity_11182302898.tcx"
 # tcx_file = r"C:\Users\paulh\Desktop\Fitness\data"
